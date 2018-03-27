@@ -51,27 +51,90 @@ readFile('words.txt', 'utf8')
     })
     .then( (arr) => {
         let sqArr = createUniqueSquaresArr();
+        let sqObj = createUSObjectReverse(sqArr);
+        // console.log(sqObj);
+        let arrWordSquares = findSquareAnagramPairs(arr, sqObj);
+        console.log(arrWordSquares);
+        let biggestSq = findBiggestSquareObj(arrWordSquares);
+        console.log(biggestSq);
     })
-    // .then( () => {
-    //     for (let word of text) {
-    //         let obj = {}
-    //         obj[word] = countLetters(word);
-    //         textObj.push(obj);
-    //     }
-    //     console.log(textObj)
-        
-    // })
-   
-// let findSquareNumbers = (arr) => {
-//     let arrOfSquares = [];
-//     for (let sArr of arr) {
-//         let word1 = sArr[0];
-//         let word2 = sArr[1];
-//         for (let char of word1 ) {
 
-//         }
-//     }
-// }
+
+let findBiggestSquareObj = (arrWordsSquareObj) => {
+    let biggestSq = 0;
+    for (let obj of arrWordsSquareObj) {
+        let keys = Object.keys(obj);
+        for (let key of keys) {
+            if (obj[key] > biggestSq) {
+                biggestSq = obj[key];
+            }
+        }
+    }
+    return biggestSq;
+}
+
+let findSquareAnagramPairs = (pairsArr, squaresObj) => {
+    let arrWordSquares = [];
+    for (let i = 0; i < pairsArr.length; i ++) {
+        let word1 = pairsArr[i][0];
+        let word2 = pairsArr[i][1];
+        let wordLength = word1.length.toString();
+        for (let num of squaresObj[wordLength]) {
+            if (getSquareAnagramObj(word1, num, word2)) {
+                arrWordSquares.push(getSquareAnagramObj(word1, num, word2))
+                break;
+            }
+        }
+    }
+    return arrWordSquares;
+}
+
+let getSquareAnagramObj = (word1, sqNum1, word2) => {
+    let sqAnagram = {};
+    let dependancy = {};
+    let sqNum1Arr = sqNum1.toString().split('');
+
+    for (let i = 0; i < word1.length; i++) {
+        dependancy[word1[i]] = sqNum1Arr[i];
+    }
+    let sqNum2 = getNumRepresent(word2, dependancy);
+    if (checkIfSquare(sqNum2)) {
+        sqAnagram[word1] = sqNum1;
+        sqAnagram[word2] = sqNum2;
+        return sqAnagram;
+    }
+    return false;
+}
+
+let getNumRepresent = (word2, dependancy1) => {
+    let numRepresent = '';
+    for ( let char of word2) {
+        numRepresent += dependancy1[char];
+    }
+    return Number(numRepresent);
+}
+
+let checkIfSquare = (num) => {
+    if (Math.sqrt(num) % 1 === 0) {
+        return true;
+    }
+    return false;
+}
+
+let createUSObjectReverse = (arr) => {
+    let obj = {}
+
+    for (let length = 3; length < 11; length ++) {
+        obj[length] = [];
+    }
+
+    for (let num of arr ) {
+        if (getNumLength(num) > 2) {
+            obj[getNumLength(num)].unshift(num);
+        }
+    }
+    return obj;
+}
 
 let createUniqueSquaresArr = () => {
     let arr = [];
@@ -112,8 +175,6 @@ let getNumLength = (number) => {
 }
 
 // console.log(createSquaresArr())
-
-  
 
 let countLetters = (word) => {
     let obj = {};
